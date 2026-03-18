@@ -12,7 +12,7 @@ local hasLocalizedLabels = false
 local function BuildLocalizedLabels()
     local hammerMod = Discovery.getHammerModule()
     if not hammerMod then return end
-    local hammerData = hammerMod.public.hammerData
+    local hammerData = hammerMod.hammerData
     for _, data in pairs(hammerData) do
         data.labels = {}
         for i, internalString in ipairs(data.values) do
@@ -132,8 +132,8 @@ local function SnapshotToStaging()
     -- Hammers
     local hammerMod = Discovery.getHammerModule()
     if hammerMod then
-        staging.HammerEnabled = hammerMod.public.config.Enabled == true
-        ShallowCopy(hammerMod.public.config.FirstHammers, staging.FirstHammers)
+        staging.HammerEnabled = hammerMod.config.Enabled == true
+        ShallowCopy(hammerMod.config.FirstHammers, staging.FirstHammers)
     end
 
     -- Profiles
@@ -252,11 +252,11 @@ end
 
 local function ToggleHammer(hammerMod, enabled)
     staging.HammerEnabled = enabled
-    hammerMod.public.config.Enabled = enabled
+    hammerMod.config.Enabled = enabled
     if enabled then
-        hammerMod.public.definition.enable()
+        hammerMod.definition.enable()
     else
-        hammerMod.public.definition.disable()
+        hammerMod.definition.disable()
     end
     InvalidateHash()
     Core.UpdateHash()
@@ -266,7 +266,7 @@ local function SetHammerChoice(weaponKey, value)
     staging.FirstHammers[weaponKey] = value
     local hammerMod = Discovery.getHammerModule()
     if hammerMod then
-        hammerMod.public.config.FirstHammers[weaponKey] = value
+        hammerMod.config.FirstHammers[weaponKey] = value
     end
     InvalidateHash()
     Core.UpdateHash()
@@ -318,7 +318,7 @@ local function DrawHammerDropdown(weaponKey, displayLabel)
 
     if not hasLocalizedLabels then BuildLocalizedLabels() end
 
-    local data = hammerMod.public.hammerData[weaponKey]
+    local data = hammerMod.hammerData[weaponKey]
     if not data then return end
 
     -- Read from staging, not Chalk
@@ -409,7 +409,7 @@ local function DrawMainWindow()
             end
             local hammerMod = Discovery.getHammerModule()
             if hammerMod and staging.HammerEnabled then
-                hammerMod.public.definition.disable()
+                hammerMod.definition.disable()
             end
         else
             -- Re-enable from staging state
@@ -420,7 +420,7 @@ local function DrawMainWindow()
             end
             local hammerMod = Discovery.getHammerModule()
             if hammerMod and staging.HammerEnabled then
-                hammerMod.public.definition.enable()
+                hammerMod.definition.enable()
             end
         end
         SetupRunData()
@@ -510,10 +510,10 @@ local function DrawMainWindow()
                 DrawColoredText(colors.info, "Quick Hammer Select for your current aspect.")
                 ui.Spacing()
 
-                local currentWeapon = hammerMod.public.GetEquippedAspect()
-                local weaponNameLabel = hammerMod.public.aspectLabels[currentWeapon] or "Unknown Weapon"
+                local currentWeapon = hammerMod.GetEquippedAspect()
+                local weaponNameLabel = hammerMod.aspectLabels[currentWeapon] or "Unknown Weapon"
 
-                if hammerMod.public.hammerData[currentWeapon] then
+                if hammerMod.hammerData[currentWeapon] then
                     DrawHammerDropdown(currentWeapon, "Equipped: " .. weaponNameLabel)
                 end
             end
@@ -531,22 +531,22 @@ local function DrawMainWindow()
                 ToggleHammer(hammerMod, hVal)
             end
             if ui.IsItemHovered() then
-                ui.SetTooltip(hammerMod.public.definition.tooltip)
+                ui.SetTooltip(hammerMod.definition.tooltip)
             end
 
             ui.Spacing()
             DrawColoredText(colors.info, "Select the guaranteed first hammer for each aspect.")
             ui.Spacing()
 
-            for _, weaponKey in ipairs(hammerMod.public.weaponDrawOrder) do
-                local weaponDisplayName = hammerMod.public.weaponLabels[weaponKey] or weaponKey
+            for _, weaponKey in ipairs(hammerMod.weaponDrawOrder) do
+                local weaponDisplayName = hammerMod.weaponLabels[weaponKey] or weaponKey
 
                 if ui.CollapsingHeader(weaponDisplayName) then
                     ui.Indent()
-                    local aspects = hammerMod.public.WeaponAspectMapping[weaponKey]
+                    local aspects = hammerMod.WeaponAspectMapping[weaponKey]
                     if aspects then
                         for _, aspectKey in ipairs(aspects) do
-                            local aspectDisplayName = hammerMod.public.aspectLabels[aspectKey] or aspectKey
+                            local aspectDisplayName = hammerMod.aspectLabels[aspectKey] or aspectKey
                             DrawHammerDropdown(aspectKey, aspectDisplayName)
                         end
                     end
@@ -751,29 +751,29 @@ local function DrawMainWindow()
 end
 
 -- =============================================================================
--- REGISTRATION
+-- REGISTRATION (guarded against re-import)
 -- =============================================================================
 
-local showModWindow = false
+if not Core._uiRegistered then
+    Core._uiRegistered = true
+    Core._showModWindow = false
 
-rom.gui.add_imgui(function()
-    if showModWindow then
-        PushTheme()
-        if ui.Begin("Speedrun Modpack", true) then
-            DrawMainWindow()
-            ui.End()
-        else
-            showModWindow = false
+    rom.gui.add_imgui(function()
+        if Core._showModWindow then
+            PushTheme()
+            if ui.Begin("Speedrun Modpack", true) then
+                DrawMainWindow()
+                ui.End()
+            else
+                Core._showModWindow = false
+            end
+            PopTheme()
         end
-        PopTheme()
-    end
-end)
+    end)
 
-rom.gui.add_to_menu_bar(function()
-    if ui.BeginMenu("Modpack") then
-        if ui.MenuItem("Toggle Mod Menu") then
-            showModWindow = not showModWindow
+    rom.gui.add_to_menu_bar(function()
+        if ui.MenuItem("Show Mod Menu") then
+            Core._showModWindow = not Core._showModWindow
         end
-        ui.EndMenu()
-    end
-end)
+    end)
+end

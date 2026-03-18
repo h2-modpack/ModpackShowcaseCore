@@ -87,8 +87,8 @@ function Discovery.run()
 
     for _, entry in ipairs(MODULE_ORDER) do
         local mod = mods[entry.modName]
-        if mod and mod.public and mod.public.definition then
-            local def = mod.public.definition
+        if mod and mod.definition then
+            local def = mod.definition
             local module = {
                 modName    = entry.modName,
                 mod        = mod,
@@ -125,11 +125,11 @@ function Discovery.run()
     -- Discover special modules
     for _, entry in ipairs(SPECIAL_MODULES) do
         local mod = mods[entry.modName]
-        if mod and mod.public and mod.public.definition then
+        if mod and mod.definition then
             Discovery.specials[entry.modName] = {
                 modName    = entry.modName,
                 mod        = mod,
-                definition = mod.public.definition,
+                definition = mod.definition,
             }
         end
     end
@@ -176,12 +176,12 @@ end
 
 --- Read a module's current Enabled state from its own config.
 function Discovery.isModuleEnabled(module)
-    return module.mod.public.config.Enabled == true
+    return module.mod.config.Enabled == true
 end
 
 --- Write a module's Enabled state and call enable/disable.
 function Discovery.setModuleEnabled(module, enabled)
-    module.mod.public.config.Enabled = enabled
+    module.mod.config.Enabled = enabled
     if enabled then
         module.definition.enable()
     else
@@ -197,3 +197,4 @@ function Discovery.getHammerModule()
 end
 
 Core.Discovery = Discovery
+Discovery.run()

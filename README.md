@@ -1,6 +1,6 @@
-# Braid Fix
+# adamant-Modpack_Core
 
-Fixes Braid of Atlas to properly buff casts.
+Coordinator for the adamant H2 modpack — unified UI, profiles, config hashing, and HUD mod mark.
 
 Part of the H2-Modpack
 

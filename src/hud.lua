@@ -59,7 +59,7 @@ local function GetConfigHash(source)
     if source then
         hammers = source.FirstHammers or {}
     elseif hammerMod then
-        hammers = hammerMod.public.config.FirstHammers or {}
+        hammers = hammerMod.config.FirstHammers or {}
     else
         hammers = {}
     end
@@ -83,6 +83,8 @@ local function GetConfigHash(source)
     end
 
     -- Boolean flags in discovery order (category order, then module order within)
+    local totalModules = 0
+    local enabledCount = 0
     for _, cat in ipairs(Discovery.categories) do
         local modules = Discovery.byCategory[cat.key] or {}
         for _, m in ipairs(modules) do
@@ -92,9 +94,12 @@ local function GetConfigHash(source)
             else
                 enabled = Discovery.isModuleEnabled(m)
             end
+            totalModules = totalModules + 1
+            if enabled then enabledCount = enabledCount + 1 end
             addBits(enabled and 1 or 0, 1)
         end
     end
+    print("[Hud] GetConfigHash: " .. totalModules .. " modules, " .. enabledCount .. " enabled")
 
     -- Flush partial bool chunk
     if bit > 0 then
@@ -106,8 +111,8 @@ local function GetConfigHash(source)
 
     -- Hammer indices
     if hammerMod then
-        local hammerData = hammerMod.public.hammerData
-        local aspectDrawOrder = hammerMod.public.aspectDrawOrder
+        local hammerData = hammerMod.hammerData
+        local aspectDrawOrder = hammerMod.aspectDrawOrder
         for _, aspectName in ipairs(aspectDrawOrder) do
             local data = hammerData[aspectName]
             local selected = hammers[aspectName] or ""
@@ -145,7 +150,7 @@ local function ApplyConfigHash(hash)
     local hammerMod = Discovery.getHammerModule()
     local hammers
     if hammerMod then
-        hammers = hammerMod.public.config.FirstHammers
+        hammers = hammerMod.config.FirstHammers
     else
         hammers = {}
     end
@@ -190,8 +195,8 @@ local function ApplyConfigHash(hash)
 
     -- Hammer indices
     if hammerMod and chunkIdx <= #chunksList then
-        local hammerData = hammerMod.public.hammerData
-        local aspectDrawOrder = hammerMod.public.aspectDrawOrder
+        local hammerData = hammerMod.hammerData
+        local aspectDrawOrder = hammerMod.aspectDrawOrder
         for _, aspectName in ipairs(aspectDrawOrder) do
             local data = hammerData[aspectName]
             local idx = readBits(HAMMER_BITS)

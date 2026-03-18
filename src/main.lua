@@ -34,9 +34,8 @@ Core = {}
 local function on_ready()
     import_as_fallback(rom.game)
 
-    -- 1. Import and run discovery
+    -- 1. Import and run discovery (discovery.lua self-runs on import)
     import 'discovery.lua'
-    Core.Discovery.run()
 
     -- 2. HUD system (hash + mod mark)
     import 'hud.lua'
