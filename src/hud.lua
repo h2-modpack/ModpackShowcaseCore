@@ -21,7 +21,7 @@ ScreenData.HUD.ComponentData.ModpackMark = {
         Text = "",
         Font = "MonospaceTypewriterBold",
         FontSize = 18,
-        Color = Color.White,
+        Color = Core.Theme.colors.text,
         ShadowRed = 0.1, ShadowBlue = 0.1, ShadowGreen = 0.1,
         OutlineColor = { 0.113, 0.113, 0.113, 1 }, OutlineThickness = 2,
         ShadowAlpha = 1.0, ShadowBlur = 1, ShadowOffset = { 0, 4 },

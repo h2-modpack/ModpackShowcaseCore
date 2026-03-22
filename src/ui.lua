@@ -283,8 +283,8 @@ local function DrawCheckboxGroup(layoutData, category)
                         local opts = staging.options[m.id] or {}
                         for _, opt in ipairs(m.options) do
                             ui.PushID(m.id .. "_" .. opt.configKey)
-                            local newVal, chg = lib.drawField(ui, opt, opts[opt.configKey], ui.GetWindowWidth() * FIELD_MEDIUM)
-                            if chg then
+                            local newVal, newChg = lib.drawField(ui, opt, opts[opt.configKey], ui.GetWindowWidth() * FIELD_MEDIUM)
+                            if newChg then
                                 ChangeOption(m, opt.configKey, newVal)
                             end
                             ui.PopID()
@@ -336,7 +336,7 @@ end
 -- TAB CONTENT DRAWERS
 -- =============================================================================
 
-local function DrawQuickSetup()>
+local function DrawQuickSetup()
     local winW = ui.GetWindowWidth()
 
     DrawColoredText(colors.info, "Select a profile to automatically configure the modpack:")

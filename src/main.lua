@@ -26,19 +26,21 @@ public.config = config
 -- Shared namespace for cross-file communication within this plugin.
 -- All imported files attach to Core and read from Core.Discovery.
 Core = {}
-local lib = rom.mods['adamant-Modpack_Lib']
+-- local lib = rom.mods['adamant-Modpack_Lib']
 
 -- =============================================================================
 -- LIFECYCLE
 -- =============================================================================
 
 local function on_ready()
+
     import_as_fallback(rom.game)
 
     -- 0. Fixed definitions (constants, default profiles)
     import 'def.lua'
 
     -- 1. Import and run discovery (discovery.lua self-runs on import)
+    import 'discovery_registry.lua'
     import 'discovery.lua'
 
     -- 2. Config hash (pure logic, no engine deps beyond Discovery)
@@ -62,6 +64,7 @@ end
 local function on_reload()
     import_as_fallback(rom.game)
     import 'def.lua'
+    import 'discovery_registry.lua'
     import 'discovery.lua'
     import 'hash.lua'
     import 'hud.lua'
