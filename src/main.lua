@@ -45,8 +45,6 @@ local function on_ready()
 
     -- 2. Config hash (pure logic, no engine deps beyond Discovery)
     import 'hash.lua'
-
-    
     -- 3. UI theme (colors, layout constants, helpers)
     import 'ui_theme.lua'
 
