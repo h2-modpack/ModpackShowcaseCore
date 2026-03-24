@@ -27,11 +27,15 @@ Scans `rom.mods` for installed adamant modules using a canonical order list.
 
 **MODULE_ORDER is append-only** -- never reorder or remove entries. Existing config hashes and profiles depend on positional encoding.
 
-To register a new module:
-1. Append to `MODULE_ORDER` (or `SPECIAL_MODULES` for special modules)
-2. Set `category` and optionally `categoryLabel` (only needed on the first entry of a new category)
+The registry contains only mod names — category, display name, and all other metadata live in each module's `public.definition`. The category string is used as both the lookup key and the tab label.
 
-The UI automatically creates tabs for new categories.
+To register a new module:
+1. Append the mod name string to `MODULE_ORDER` in `discovery_registry.lua` (or `SPECIAL_MODULES` for special modules)
+2. Set `def.category` in the module's `public.definition` to the desired tab name (e.g. `"Bug Fixes"`)
+
+A new tab is created automatically the first time a module with an unseen `def.category` is discovered.
+
+CI enforces append-only order via `enforce-discovery-order.yml` — it compares the existing module sequence against `main` and fails if any previously registered entry is reordered or removed.
 
 ### Config hash (hash.lua)
 
@@ -80,7 +84,7 @@ Add to `Core.Def.defaultProfiles` in def.lua. Get the hash from the Profiles tab
 
 ### Adding a new category
 
-Append entries to `MODULE_ORDER` in discovery.lua with a new category key and `categoryLabel` on the first entry.
+Set `def.category` to a new string in the module's `public.definition`. The tab appears automatically — no registry change needed.
 
 ## Guidelines
 
