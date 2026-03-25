@@ -332,27 +332,20 @@ function TestHashErrors:testNilHashRejected()
     lu.assertFalse(Hash.ApplyConfigHash(nil))
 end
 
-function TestHashErrors:testEmptyHashAppliesDefaults()
-    -- Empty canonical string is valid — means all values are at defaults
+function TestHashErrors:testEmptyHashRejected()
+    -- Empty string is invalid — valid all-defaults canonical is "_v=1"
     local discovery = MockDiscovery.create({
         { id = "A", category = "Cat1", enabled = true, default = false },
     })
     local _, ApplyHash = withDiscovery(discovery)
-    local result = ApplyHash("")
-    lu.assertTrue(result)
-    lu.assertFalse(discovery.modules[1].mod.config.Enabled)  -- reset to default
+    lu.assertFalse(ApplyHash(""))
 end
 
-function TestHashErrors:testMalformedHashStillAppliesDefaults()
-    -- Malformed entries are ignored, modules reset to defaults
+function TestHashErrors:testMalformedHashRejected()
+    -- Input with no parseable key=value pairs (missing version key) is rejected
     local discovery = MockDiscovery.create({
         { id = "A", category = "Cat1", enabled = true, default = false },
     })
     local _, ApplyHash = withDiscovery(discovery)
-
-    -- "A" is not a valid key=value pair but the hash string is non-empty
-    -- Should return true (non-empty input) and reset A to default
-    local result = ApplyHash("notavalidentry")
-    lu.assertTrue(result)
-    lu.assertFalse(discovery.modules[1].mod.config.Enabled)  -- reset to default
+    lu.assertFalse(ApplyHash("notavalidentry"))
 end

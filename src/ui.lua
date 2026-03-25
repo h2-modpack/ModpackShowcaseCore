@@ -12,8 +12,12 @@ local SIDEBAR_RATIO     = T.SIDEBAR_RATIO
 local FIELD_MEDIUM      = T.FIELD_MEDIUM
 local FIELD_NARROW      = T.FIELD_NARROW
 local FIELD_WIDE        = T.FIELD_WIDE
-local DrawColoredText   = T.DrawColoredText
-local PushTextColor     = T.PushTextColor
+local function DrawColoredText(color, text)
+    ui.TextColored(color[1], color[2], color[3], color[4], text)
+end
+local function PushTextColor(color)
+    ui.PushStyleColor(rom.ImGuiCol.Text, color[1], color[2], color[3], color[4])
+end
 local PushTheme         = T.PushTheme
 local PopTheme          = T.PopTheme
 
@@ -450,7 +454,7 @@ local function DrawProfiles()
     ui.Text("Import Hash:")
     ui.SameLine()
     ui.PushItemWidth(winW * FIELD_MEDIUM)
-    local newText, changed = ui.InputText("##ImportHash", importHashBuffer, 256)
+    local newText, changed = ui.InputText("##ImportHash", importHashBuffer, 2048)
     if changed then importHashBuffer = newText end
     ui.PopItemWidth()
     ui.SameLine()
@@ -464,14 +468,6 @@ local function DrawProfiles()
             SetImportFeedback("Imported successfully!", colors.success)
         else
             SetImportFeedback("Invalid hash.", colors.error)
-        end
-    end
-    if importFeedback then
-        if os.clock() - importFeedbackTime > FEEDBACK_DURATION then
-            importFeedback = nil
-        else
-            ui.SameLine()
-            DrawColoredText(importFeedbackColor, importFeedback)
         end
     end
 
@@ -524,12 +520,6 @@ local function DrawProfiles()
     end
     ui.PopItemWidth()
 
-    if hasData then
-        ui.Text("Hash:")
-        ui.SameLine()
-        DrawColoredText(colors.textDisabled, ps.Hash)
-    end
-
     ui.Spacing()
 
     if ui.Button("Save Current") then
@@ -541,11 +531,23 @@ local function DrawProfiles()
             config.Profiles[selectedProfileSlot].Name = ps.Name
         end
         slotLabelsDirty = true
+        SetImportFeedback("Profile saved.", colors.success)
     end
 
     if hasData then
         ui.SameLine()
-        if ui.Button("Load") then LoadProfile(ps.Hash) end
+        if ui.Button("Load") then
+            if LoadProfile(ps.Hash) then
+                SetImportFeedback("Profile loaded.", colors.success)
+            else
+                SetImportFeedback("Failed to load profile.", colors.error)
+            end
+        end
+        ui.SameLine()
+        if ui.Button("Copy Hash") then
+            ui.SetClipboardText(ps.Hash)
+            SetImportFeedback("Copied to clipboard!", colors.success)
+        end
         ui.SameLine()
         if ui.Button("Clear") then
             ps.Name = ""
@@ -556,6 +558,7 @@ local function DrawProfiles()
             cp.Hash = ""
             cp.Tooltip = ""
             slotLabelsDirty = true
+            SetImportFeedback("Slot cleared.", colors.textDisabled)
         end
         if ui.IsItemHovered() then
             ui.SetTooltip("Permanently clears this profile slot.")
@@ -584,9 +587,20 @@ local function DrawProfiles()
             end
         end
         slotLabelsDirty = true
+        SetImportFeedback("Default profiles restored.", colors.success)
     end
     if ui.IsItemHovered() then
         ui.SetTooltip("Overwrites ALL profile slots with the shipped defaults. Custom profiles will be lost.")
+    end
+
+    -- Status bar: single feedback line for all profile actions
+    ui.Spacing()
+    if importFeedback then
+        if os.clock() - importFeedbackTime > FEEDBACK_DURATION then
+            importFeedback = nil
+        else
+            DrawColoredText(importFeedbackColor, importFeedback)
+        end
     end
 end
 
@@ -613,21 +627,43 @@ local function DrawDev()
     DrawColoredText(colors.info, "Per-Module Debug")
     ui.Spacing()
 
-    -- Regular modules
-    for _, m in ipairs(Discovery.modules) do
-        local val, chg = ui.Checkbox(m._debugLabel, staging.debug[m.id])
-        if chg then
-            staging.debug[m.id] = val
-            Discovery.setDebugEnabled(m, val)
+    -- Regular modules grouped by category (same order as sidebar)
+    for _, cat in ipairs(Discovery.categories) do
+        local modules = Discovery.byCategory[cat.key] or {}
+        if #modules > 0 then
+            PushTextColor(colors.info)
+            local open = ui.CollapsingHeader(cat.label, ImGuiTreeNodeFlags.DefaultOpen)
+            ui.PopStyleColor()
+            if open then
+                ui.Indent()
+                for _, m in ipairs(modules) do
+                    local val, chg = ui.Checkbox(m._debugLabel, staging.debug[m.id])
+                    if chg then
+                        staging.debug[m.id] = val
+                        Discovery.setDebugEnabled(m, val)
+                    end
+                end
+                ui.Unindent()
+                ui.Spacing()
+            end
         end
     end
 
     -- Special modules
-    for _, special in ipairs(Discovery.specials) do
-        local val, chg = ui.Checkbox(special._debugLabel, staging.debug[special.modName])
-        if chg then
-            staging.debug[special.modName] = val
-            Discovery.setDebugEnabled(special, val)
+    if #Discovery.specials > 0 then
+        PushTextColor(colors.info)
+        local open = ui.CollapsingHeader("Specials", ImGuiTreeNodeFlags.DefaultOpen)
+        ui.PopStyleColor()
+        if open then
+            ui.Indent()
+            for _, special in ipairs(Discovery.specials) do
+                local val, chg = ui.Checkbox(special._debugLabel, staging.debug[special.modName])
+                if chg then
+                    staging.debug[special.modName] = val
+                    Discovery.setDebugEnabled(special, val)
+                end
+            end
+            ui.Unindent()
         end
     end
 end

@@ -197,12 +197,17 @@ end
 --- @param hash string The canonical key-value string to decode
 --- @return boolean success
 function Hash.ApplyConfigHash(hash)
-    if hash == nil then
-        lib.warn("ApplyConfigHash: nil hash")
+    if hash == nil or hash == "" then
+        lib.warn("ApplyConfigHash: empty hash")
         return false
     end
 
     local kv = Deserialize(hash)
+
+    if kv["_v"] == nil then
+        lib.warn("ApplyConfigHash: unrecognized format (missing version key) — hash may be from an older format")
+        return false
+    end
 
     local version = tonumber(kv["_v"]) or 1
     if version > HASH_VERSION then

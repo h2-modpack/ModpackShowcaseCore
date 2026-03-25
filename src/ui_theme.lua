@@ -4,7 +4,7 @@
 -- Purely declarative — no runtime dependencies.
 -- Imported by ui.lua via `import 'ui_theme.lua'`.
 
-local ui = rom.ImGui
+local ui    = rom.ImGui
 local uiCol = rom.ImGuiCol
 
 -- =============================================================================
@@ -44,7 +44,22 @@ local colors = {
 -- =============================================================================
 
 local ImGuiTreeNodeFlags = {
-    DefaultOpen = 32,
+    None                 = 0,
+    Selected             = 1,
+    Framed               = 2,
+    AllowOverlap         = 4,
+    NoTreePushOnOpen     = 8,
+    NoAutoOpenOnLog      = 16,
+    DefaultOpen          = 32,
+    OpenOnDoubleClick    = 64,
+    OpenOnArrow          = 128,
+    Leaf                 = 256,
+    Bullet               = 512,
+    FramePadding         = 1024,
+    SpanAvailWidth       = 2048,
+    SpanFullWidth        = 4096,
+    NavLeftJumpsBackHere = 8192,
+    CollapsingHeader     = 26,   -- Framed | NoTreePushOnOpen | NoAutoOpenOnLog
 }
 
 -- =============================================================================
@@ -55,18 +70,6 @@ local SIDEBAR_RATIO = 0.2    -- sidebar takes 20% of window
 local FIELD_MEDIUM  = 0.5    -- combos, hash inputs
 local FIELD_NARROW  = 0.3    -- short inputs (name, slot selector)
 local FIELD_WIDE    = 0.85   -- long text (tooltip)
-
--- =============================================================================
--- THEME HELPERS
--- =============================================================================
-
-local function DrawColoredText(color, text)
-    ui.TextColored(color[1], color[2], color[3], color[4], text)
-end
-
-local function PushTextColor(color)
-    ui.PushStyleColor(uiCol.Text, color[1], color[2], color[3], color[4])
-end
 
 local themeColors = {
     { uiCol.Text,            colors.text },
@@ -106,14 +109,12 @@ end
 -- =============================================================================
 
 Core.Theme = {
-    colors            = colors,
+    colors             = colors,
     ImGuiTreeNodeFlags = ImGuiTreeNodeFlags,
-    SIDEBAR_RATIO     = SIDEBAR_RATIO,
-    FIELD_MEDIUM      = FIELD_MEDIUM,
-    FIELD_NARROW      = FIELD_NARROW,
-    FIELD_WIDE        = FIELD_WIDE,
-    DrawColoredText   = DrawColoredText,
-    PushTextColor     = PushTextColor,
-    PushTheme         = PushTheme,
-    PopTheme          = PopTheme,
+    SIDEBAR_RATIO      = SIDEBAR_RATIO,
+    FIELD_MEDIUM       = FIELD_MEDIUM,
+    FIELD_NARROW       = FIELD_NARROW,
+    FIELD_WIDE         = FIELD_WIDE,
+    PushTheme          = PushTheme,
+    PopTheme           = PopTheme,
 }

@@ -34,6 +34,11 @@ rom.mods['SGG_Modding-ENVY'] = {
     auto = function() return {} end,
 }
 
+-- Minimal Chalk mock: auto() returns a plain table (the "config")
+rom.mods['SGG_Modding-Chalk'] = {
+    auto = function() return { DebugMode = false } end,
+}
+
 -- Warning capture
 Warnings = {}
 
@@ -145,6 +150,14 @@ function MockDiscovery.create(moduleConfigs, optionConfigs, specialConfigs)
 
     function discovery.setOptionValue(m, configKey, value)
         m.mod.config[configKey] = value
+    end
+
+    function discovery.isSpecialEnabled(special)
+        return special.mod.config.Enabled == true
+    end
+
+    function discovery.setSpecialEnabled(special, enabled)
+        special.mod.config.Enabled = enabled
     end
 
     return discovery
