@@ -1,6 +1,6 @@
-# Contributing to adamant-Modpack_Core
+# Contributing to adamant-ModpackShowcaseCore
 
-Thin coordinator for the adamant H2 modpack. Owns pack identity, config, and default profiles — delegates all orchestration to `adamant-Modpack_Framework`.
+Thin coordinator showcasing the h2-modpack architecture. Owns pack identity, config, and default profiles — delegates all orchestration to `adamant-ModpackFramework`.
 
 ## Architecture
 
@@ -10,23 +10,23 @@ src/
 config.lua    -- Chalk config schema (ModEnabled, DebugMode, Profiles)
 ```
 
-Core has no other source files. All discovery, hashing, HUD, and UI logic lives in [adamant-Modpack_Framework](https://github.com/h2-modpack/adamant-modpack-Framework). See its [CONTRIBUTING.md](https://github.com/h2-modpack/adamant-modpack-Framework/blob/main/CONTRIBUTING.md) for architecture, key systems, and guidelines.
+The coordinator has no other source files. All discovery, hashing, HUD, and UI logic lives in [adamant-ModpackFramework](https://github.com/h2-modpack/ModpackFramework). See its CONTRIBUTING.md for architecture, key systems, and guidelines.
 
-## What Core owns
+## What the coordinator owns
 
-**`packId`** — `"h2-modpack"`. This is the discovery filter: only modules with `definition.modpack = "h2-modpack"` are picked up.
+**`packId`** — `"h2-modpack"`. Discovery filter: only modules with `definition.modpack = "h2-modpack"` are picked up by Framework.
 
 **`windowTitle`** — `"Speedrun Modpack"`. Displayed as the ImGui window title.
 
-**`def.defaultProfiles`** — The three shipped presets (AnyFear, HighFear, RTA). To add or update a preset, edit `def` in `src/main.lua`. Get the hash string from the Profiles tab export field in-game.
+**`def.defaultProfiles`** — Shipped presets. To add or update a preset, edit `def` in `src/main.lua`. Get the hash string from the Profiles tab export field in-game.
 
 **`config.lua`** — Chalk schema: `ModEnabled`, `DebugMode`, `Profiles` array. The Profiles array length determines `def.NUM_PROFILES` and must match the number of slots rendered in the UI.
 
 ## No tests
 
-Tests live in `adamant-Modpack_Framework`. Run them from there:
+Tests live in `adamant-ModpackFramework`. Run them from there:
 
-```
-cd adamant-modpack-Framework
+```bash
+cd adamant-ModpackFramework
 lua5.1 tests/all.lua
 ```

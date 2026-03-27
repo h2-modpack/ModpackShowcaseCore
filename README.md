@@ -1,13 +1,13 @@
-# adamant-Modpack_Core
+# adamant-ModpackShowcaseCore
 
-Coordinator for the adamant H2 modpack. Owns the pack identity, config, and default profiles. All orchestration (discovery, UI, hashing, HUD) is provided by `adamant-Modpack_Framework`.
+Coordinator for the H2 Modpack showcase. Owns pack identity, config, and default profiles. All orchestration (discovery, UI, hashing, HUD) is provided by `adamant-ModpackFramework`.
 
-Part of the [H2 Modpack](https://github.com/h2-modpack/h2-modular-modpack).
+Part of [h2-modular-modpack](https://github.com/h2-modpack/h2-modular-modpack).
 
 ## Install
 
-Install via r2modman or Thunderstore. Requires `adamant-Modpack_Lib` and `adamant-Modpack_Framework`.
+Install via r2modman or Thunderstore. Requires `adamant-ModpackLib` and `adamant-ModpackFramework`.
 
 ## For contributors
 
-See [CONTRIBUTING.md](CONTRIBUTING.md) for what Core owns, and [adamant-Modpack_Framework](https://github.com/h2-modpack/adamant-modpack-Framework) for the full architecture.
+See [CONTRIBUTING.md](CONTRIBUTING.md) for what the coordinator owns, and [adamant-ModpackFramework](https://github.com/h2-modpack/ModpackFramework) for the full architecture.
